@@ -1,0 +1,5 @@
+services:
+  falkordb:
+    ports:
+      - "127.0.0.1:6380:6379"
+

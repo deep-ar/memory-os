@@ -1,0 +1,270 @@
+{
+  "schema_version": 1,
+  "id": "memoryos-controlled",
+  "version": "0.1.0",
+  "title": "MemoryOS controlled black-box seed corpus",
+  "profile": "controlled-v0.1",
+  "projects": [
+    {
+      "id": "memoryos-bench-editor-a-v01",
+      "name": "Benchmark editor A",
+      "description": "Controlled fixture using pnpm and atomic Windows writes."
+    },
+    {
+      "id": "memoryos-bench-api-b-v01",
+      "name": "Benchmark API B",
+      "description": "Controlled fixture using npm; must remain isolated from editor A."
+    }
+  ],
+  "deltas": [
+    {
+      "id": "seed-editor-a",
+      "project_id": "memoryos-bench-editor-a-v01",
+      "memory_delta": {
+        "expected_revision": 0,
+        "reflection": {
+          "agent_id": "memoryos-bench",
+          "agent_type": "benchmark",
+          "session_id": "controlled-v0.1",
+          "task_id": "seed-editor-a",
+          "workspace_id": null,
+          "worktree_id": null,
+          "branch": null,
+          "commit": null,
+          "trigger": "manual"
+        },
+        "concepts": [
+          {
+            "id": "pkg-manager-a",
+            "project_id": "memoryos-bench-editor-a-v01",
+            "canonical_name": "pnpm package manager",
+            "description": "The package manager selected by editor A.",
+            "concept_type": "tool",
+            "aliases": ["pnpm", "package manager"]
+          },
+          {
+            "id": "atomic-write-a",
+            "project_id": "memoryos-bench-editor-a-v01",
+            "canonical_name": "atomic settings write",
+            "description": "Safe persistence using a temporary file and atomic rename.",
+            "concept_type": "implementation_pattern",
+            "aliases": ["atomic save", "безопасное сохранение"]
+          }
+        ],
+        "claims": [
+          {
+            "id": "claim-pnpm-a",
+            "project_id": "memoryos-bench-editor-a-v01",
+            "subject_id": "pkg-manager-a",
+            "predicate": "USES_PACKAGE_MANAGER",
+            "object_id": null,
+            "statement": "Editor A installs workspace dependencies with pnpm.",
+            "epistemic_basis": "decision",
+            "confidence_level": "established",
+            "lifecycle_status": "active",
+            "valid_from": null,
+            "valid_to": null,
+            "last_verified_at": "2026-09-01T00:00:00.000Z",
+            "context_ids": [],
+            "evidence_ids": ["evidence-pnpm-a"],
+            "supports": [],
+            "contradicts": [],
+            "supersedes": [],
+            "refines": [],
+            "derived_from": []
+          },
+          {
+            "id": "claim-atomic-windows-a",
+            "project_id": "memoryos-bench-editor-a-v01",
+            "subject_id": "atomic-write-a",
+            "predicate": "WRITES_SETTINGS_SAFELY",
+            "object_id": null,
+            "statement": "На Windows настройки сначала записываются во временный файл, затем файл атомарно переименовывается.",
+            "epistemic_basis": "tested",
+            "confidence_level": "verified",
+            "lifecycle_status": "active",
+            "valid_from": null,
+            "valid_to": null,
+            "last_verified_at": "2026-09-01T00:00:00.000Z",
+            "context_ids": ["context-windows-a"],
+            "evidence_ids": [],
+            "supports": [],
+            "contradicts": [],
+            "supersedes": [],
+            "refines": [],
+            "derived_from": []
+          }
+        ],
+        "evidence": [
+          {
+            "id": "evidence-pnpm-a",
+            "project_id": "memoryos-bench-editor-a-v01",
+            "type": "documentation",
+            "summary": "packageManager declares pnpm.",
+            "content": "packageManager: pnpm",
+            "source_uri": null,
+            "repo": "benchmark/editor-a",
+            "commit": null,
+            "branch": null,
+            "file": "package.json",
+            "symbol": null,
+            "line_start": 1,
+            "line_end": 1,
+            "command": null,
+            "result": null,
+            "quote": null,
+            "observed_at": "2026-09-01T00:00:00.000Z",
+            "retrieved_at": null,
+            "content_hash": null
+          }
+        ],
+        "contexts": [
+          {
+            "id": "context-windows-a",
+            "project_id": "memoryos-bench-editor-a-v01",
+            "name": "Windows desktop",
+            "description": "Windows-specific persistence behavior.",
+            "dimensions": {
+              "operating_system": "Windows",
+              "application": "Editor A",
+              "runtime": "Node.js",
+              "runtime_version": "24",
+              "framework": null,
+              "framework_version": null,
+              "platform": "desktop",
+              "environment": "production"
+            },
+            "concept_ids": ["atomic-write-a"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "seed-api-b",
+      "project_id": "memoryos-bench-api-b-v01",
+      "memory_delta": {
+        "expected_revision": 0,
+        "reflection": {
+          "agent_id": "memoryos-bench",
+          "agent_type": "benchmark",
+          "session_id": "controlled-v0.1",
+          "task_id": "seed-api-b",
+          "workspace_id": null,
+          "worktree_id": null,
+          "branch": null,
+          "commit": null,
+          "trigger": "manual"
+        },
+        "concepts": [
+          {
+            "id": "pkg-manager-b",
+            "project_id": "memoryos-bench-api-b-v01",
+            "canonical_name": "npm package manager",
+            "description": "The package manager selected by API B.",
+            "concept_type": "tool",
+            "aliases": ["npm", "package manager"]
+          }
+        ],
+        "claims": [
+          {
+            "id": "claim-npm-b",
+            "project_id": "memoryos-bench-api-b-v01",
+            "subject_id": "pkg-manager-b",
+            "predicate": "USES_PACKAGE_MANAGER",
+            "object_id": null,
+            "statement": "API B installs dependencies with npm, not pnpm.",
+            "epistemic_basis": "decision",
+            "confidence_level": "established",
+            "lifecycle_status": "active",
+            "valid_from": null,
+            "valid_to": null,
+            "last_verified_at": "2026-09-01T00:00:00.000Z",
+            "context_ids": [],
+            "evidence_ids": [],
+            "supports": [],
+            "contradicts": [],
+            "supersedes": [],
+            "refines": [],
+            "derived_from": []
+          }
+        ],
+        "evidence": [],
+        "contexts": []
+      }
+    }
+  ],
+  "probes": [
+    {
+      "id": "exact-pnpm-a",
+      "track": "exact",
+      "project_id": "memoryos-bench-editor-a-v01",
+      "query": { "text": "pnpm", "max_results": 10, "graph_depth": 1 },
+      "gold": {
+        "relevant": [
+          { "entity_type": "concept", "entity_id": "pkg-manager-a", "relevance": 3 },
+          { "entity_type": "claim", "entity_id": "claim-pnpm-a", "relevance": 2 }
+        ],
+        "forbidden": []
+      }
+    },
+    {
+      "id": "semantic-atomic-a",
+      "track": "semantic",
+      "project_id": "memoryos-bench-editor-a-v01",
+      "query": { "text": "Как приложение не допускает повреждения настроек при сохранении?", "max_results": 10, "graph_depth": 1 },
+      "gold": {
+        "relevant": [
+          { "entity_type": "claim", "entity_id": "claim-atomic-windows-a", "relevance": 3 },
+          { "entity_type": "concept", "entity_id": "atomic-write-a", "relevance": 2 }
+        ],
+        "forbidden": []
+      }
+    },
+    {
+      "id": "technical-atomic-fsync-rename-a",
+      "track": "technical",
+      "project_id": "memoryos-bench-editor-a-v01",
+      "query": { "text": "fsync sibling temporary file atomic rename", "max_results": 10, "graph_depth": 1 },
+      "gold": {
+        "relevant": [
+          { "entity_type": "claim", "entity_id": "claim-atomic-windows-a", "relevance": 3 },
+          { "entity_type": "concept", "entity_id": "atomic-write-a", "relevance": 2 }
+        ],
+        "forbidden": []
+      }
+    },
+    {
+      "id": "context-windows-a",
+      "track": "context",
+      "project_id": "memoryos-bench-editor-a-v01",
+      "query": {
+        "text": "How are settings persisted safely?",
+        "context": { "operating_system": "Windows", "application": "Editor A" },
+        "max_results": 10,
+        "graph_depth": 1
+      },
+      "gold": {
+        "relevant": [
+          { "entity_type": "claim", "entity_id": "claim-atomic-windows-a", "relevance": 3 }
+        ],
+        "forbidden": []
+      }
+    },
+    {
+      "id": "isolation-package-manager-b",
+      "track": "isolation",
+      "project_id": "memoryos-bench-api-b-v01",
+      "query": { "text": "Which package manager installs dependencies?", "max_results": 10, "graph_depth": 1 },
+      "gold": {
+        "relevant": [
+          { "entity_type": "concept", "entity_id": "pkg-manager-b", "relevance": 3 },
+          { "entity_type": "claim", "entity_id": "claim-npm-b", "relevance": 2 }
+        ],
+        "forbidden": [
+          { "entity_type": "concept", "entity_id": "pkg-manager-a" },
+          { "entity_type": "claim", "entity_id": "claim-pnpm-a" }
+        ]
+      }
+    }
+  ]
+}

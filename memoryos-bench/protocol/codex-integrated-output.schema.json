@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["decision", "changes", "trace", "memory_citations"],
+  "properties": {
+    "decision": { "type": "string", "minLength": 1 },
+    "changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "content"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "content": { "type": "string" }
+        }
+      }
+    },
+    "trace": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "name", "known_failure_id"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["agent_step", "tool_call", "shell_call", "file_read", "web_read", "test_run", "failed_attempt"]
+          },
+          "name": { "type": "string", "minLength": 1 },
+          "known_failure_id": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "memory_citations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["memory_id", "influence", "stale"],
+        "properties": {
+          "memory_id": { "type": "string", "minLength": 1 },
+          "influence": { "type": "string", "enum": ["helpful", "harmful", "neutral"] },
+          "stale": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}

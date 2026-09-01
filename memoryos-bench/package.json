@@ -1,0 +1,25 @@
+{
+  "name": "@memoryos/bench",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "memoryos-bench": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "stand:up": "docker compose -f compose.benchmark.yaml -p memoryos-bench-v01 up --build -d",
+    "stand:down": "docker compose -f compose.benchmark.yaml -p memoryos-bench-v01 down",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/client": "^2.0.0",
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^26.4.0",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11"
+  }
+}

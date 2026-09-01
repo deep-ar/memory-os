@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "dataset_id": "memoryos-curator-controlled",
+  "dataset_version": "0.1.0",
+  "prompt_version": "curator-prompt-v0.1",
+  "memory_skill_version": "memory-reflection-contract-v1",
+  "agent": {
+    "provider": "benchmark-fixture",
+    "model": "fault-injection-curator",
+    "version": "0.1.0",
+    "reasoning_mode": "evaluator-calibration"
+  },
+  "responses": {
+    "curator-admission-context-001": {
+      "output": {
+        "memory_delta": {
+          "expected_revision": 0,
+          "reflection": { "trigger": "task_complete" },
+          "concepts": [
+            {
+              "id": "concept-atomic-settings-write",
+              "project_id": "curator-editor-a",
+              "canonical_name": "atomic settings write",
+              "concept_type": "implementation_pattern"
+            },
+            {
+              "id": "concept-preview-port-4317",
+              "project_id": "curator-editor-a",
+              "canonical_name": "preview port 4317",
+              "concept_type": "configuration"
+            }
+          ],
+          "claims": [
+            {
+              "id": "claim-atomic-settings-windows",
+              "project_id": "curator-editor-a",
+              "subject_id": "concept-atomic-settings-write",
+              "predicate": "PREVENTS_INTERRUPTED_SAVE_CORRUPTION",
+              "statement": "Atomic rename might prevent corruption everywhere.",
+              "epistemic_basis": "hypothesis",
+              "confidence_level": "tentative",
+              "lifecycle_status": "active"
+            },
+            {
+              "id": "claim-preview-port",
+              "project_id": "curator-editor-a",
+              "subject_id": "concept-preview-port-4317",
+              "predicate": "ALWAYS_USES_PORT",
+              "statement": "Editor A always uses port 4317.",
+              "epistemic_basis": "observed",
+              "confidence_level": "verified",
+              "lifecycle_status": "active"
+            }
+          ],
+          "evidence": [],
+          "contexts": []
+        }
+      },
+      "cost": {
+        "input_tokens": 850,
+        "output_tokens": 250,
+        "cached_tokens": 0,
+        "tool_calls": 0,
+        "wall_time_ms": 9,
+        "api_cost": 0
+      }
+    },
+    "curator-promotion-trap-002": {
+      "output": {
+        "memory_delta": {
+          "expected_revision": 2,
+          "reflection": { "trigger": "major_discovery" },
+          "concepts": [],
+          "claims": [{
+            "id": "claim-promotion-universal",
+            "project_id": "curator-runtime-b",
+            "subject_id": "concept-temp-rename",
+            "predicate": "REDUCES_INTERRUPTED_WRITE_CORRUPTION",
+            "statement": "Always use temporary-file rename on every platform.",
+            "epistemic_basis": "inferred",
+            "confidence_level": "established",
+            "lifecycle_status": "active"
+          }],
+          "evidence": [],
+          "contexts": []
+        }
+      },
+      "cost": {
+        "input_tokens": 720,
+        "output_tokens": 130,
+        "cached_tokens": 0,
+        "tool_calls": 0,
+        "wall_time_ms": 7,
+        "api_cost": 0
+      }
+    },
+    "curator-transition-conflict-003": {
+      "output": {
+        "memory_delta": {
+          "expected_revision": 3,
+          "reflection": { "trigger": "significant_test" },
+          "concepts": [],
+          "claims": [
+            {
+              "id": "claim-retry-stable",
+              "project_id": "curator-api-c",
+              "subject_id": "concept-retry-policy",
+              "predicate": "PASSES_PRODUCTION_MATRIX",
+              "statement": "Retry behavior is still uncertain.",
+              "epistemic_basis": "hypothesis",
+              "confidence_level": "tentative",
+              "lifecycle_status": "active"
+            },
+            {
+              "id": "claim-timeout-v3",
+              "project_id": "curator-api-c",
+              "subject_id": "concept-api-timeout",
+              "predicate": "HAS_DEFAULT_SECONDS",
+              "statement": "API v3 probably uses another timeout.",
+              "epistemic_basis": "hypothesis",
+              "confidence_level": "tentative",
+              "lifecycle_status": "disputed",
+              "contradicts": ["claim-timeout-v2"]
+            }
+          ],
+          "evidence": [],
+          "contexts": []
+        }
+      },
+      "cost": {
+        "input_tokens": 910,
+        "output_tokens": 210,
+        "cached_tokens": 0,
+        "tool_calls": 0,
+        "wall_time_ms": 8,
+        "api_cost": 0
+      }
+    }
+  }
+}

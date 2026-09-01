@@ -1,0 +1,17 @@
+{
+  "name": "memory-os",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.32.1",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "build": "pnpm --recursive --if-present build",
+    "memoryos": "node apps/cli/dist/entry.js",
+    "test": "pnpm --recursive --if-present test",
+    "typecheck": "pnpm --recursive --if-present typecheck",
+    "dev": "pnpm --filter @memoryos/service dev"
+  }
+}

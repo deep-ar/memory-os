@@ -1,0 +1,10 @@
+{
+  "memoryos": {
+    "type": "stdio",
+    "command": "node",
+    "args": ["<MEMORYOS_INSTALL_DIR>/apps/service/dist/mcp-stdio.js"],
+    "env": {
+      "MEMORYOS_HTTP_URL": "http://127.0.0.1:7310/mcp"
+    }
+  }
+}

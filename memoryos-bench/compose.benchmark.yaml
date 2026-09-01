@@ -1,0 +1,41 @@
+services:
+  memoryos:
+    build:
+      context: ..
+      dockerfile: apps/service/Dockerfile
+    environment:
+      MEMORYOS_HOST: 0.0.0.0
+      MEMORYOS_PORT: 7310
+      MEMORYOS_ALLOWED_HOSTS: localhost,127.0.0.1,[::1],memoryos
+      FALKORDB_URL: falkor://falkordb:6379
+      OLLAMA_URL: http://host.docker.internal:11434
+      OLLAMA_EMBEDDING_MODEL: bge-m3
+      MEMORYOS_WEB_ROOT: /app/public
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "127.0.0.1:17310:7310"
+    depends_on:
+      falkordb:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - fetch('http://127.0.0.1:7310/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))
+      interval: 3s
+      timeout: 2s
+      retries: 30
+
+  falkordb:
+    image: falkordb/falkordb:v4.20.4-alpine
+    tmpfs:
+      - /var/lib/falkordb/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 2s
+      retries: 30
+    expose:
+      - "6379"

@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "id": "memoryos-integrated-live-smoke",
+  "version": "0.1.0",
+  "title": "Single-scenario external-agent smoke profile",
+  "profile": "integrated-controlled-v0.1",
+  "prompt_version": "integrated-prompt-v0.1",
+  "toolset_version": "structured-swe-v0.1",
+  "response_contract_version": "integrated-output-v0.1",
+  "repetitions": 3,
+  "scenarios": [
+    {
+      "id": "integrated-atomic-reuse-001",
+      "project_id": "integrated-editor-b",
+      "family": "safe-file-replacement",
+      "episode_index": 20,
+      "task": "Change settings persistence to survive interruption without corrupting the target file.",
+      "decision_options": ["keep_direct_write", "atomic_target_temp_rename", "append_only_log"],
+      "repository": {
+        "files": { "settings-policy.json": "{\"save_strategy\":\"direct_write\"}" },
+        "allowed_change_paths": ["settings-policy.json"]
+      },
+      "memory": {
+        "oracle_memory": [{
+          "id": "mem-atomic-target-dir",
+          "text": "A tested pattern writes and fsyncs a sibling temporary file in the target directory, then atomically replaces the target.",
+          "source_project_id": "curator-editor-a",
+          "kind": "claim",
+          "stale": false
+        }],
+        "oracle_writes": [{
+          "id": "mem-atomic-target-dir",
+          "text": "A tested pattern writes and fsyncs a sibling temporary file in the target directory, then atomically replaces the target.",
+          "source_project_id": "curator-editor-a",
+          "kind": "claim",
+          "stale": false
+        }],
+        "full_memory_os": [{
+          "id": "mem-atomic-target-dir",
+          "text": "Use a sibling temporary file, fsync, and atomic target replacement for interrupted-write safety.",
+          "source_project_id": "curator-editor-a",
+          "kind": "summary",
+          "stale": false
+        }],
+        "flat_rag": [{
+          "id": "mem-atomic-target-dir",
+          "text": "old note: sibling temp + fsync + rename avoided settings corruption",
+          "source_project_id": "curator-editor-a",
+          "kind": "chunk",
+          "stale": false
+        }]
+      },
+      "validator": {
+        "expected_decision": "atomic_target_temp_rename",
+        "expected_files": { "settings-policy.json": "{\"save_strategy\":\"atomic_target_temp_rename\"}" },
+        "known_failure_ids": ["direct-write-corruption"],
+        "positive_transfer_memory_ids": ["mem-atomic-target-dir"],
+        "stale_memory_ids": []
+      }
+    }
+  ]
+}

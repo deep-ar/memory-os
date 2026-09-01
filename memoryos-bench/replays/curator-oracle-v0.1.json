@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "dataset_id": "memoryos-curator-controlled",
+  "dataset_version": "0.1.0",
+  "prompt_version": "curator-prompt-v0.1",
+  "memory_skill_version": "memory-reflection-contract-v1",
+  "agent": {
+    "provider": "benchmark-fixture",
+    "model": "oracle-curator",
+    "version": "0.1.0",
+    "reasoning_mode": "gold-calibration"
+  },
+  "responses": {
+    "curator-admission-context-001": {
+      "output": {
+        "memory_delta": {
+          "expected_revision": 0,
+          "reflection": { "trigger": "task_complete" },
+          "concepts": [{
+            "id": "concept-atomic-settings-write",
+            "project_id": "curator-editor-a",
+            "canonical_name": "atomic settings write",
+            "description": "Crash-safe settings persistence through temporary-file replacement.",
+            "concept_type": "implementation_pattern",
+            "aliases": ["atomic save"]
+          }],
+          "claims": [{
+            "id": "claim-atomic-settings-windows",
+            "project_id": "curator-editor-a",
+            "subject_id": "concept-atomic-settings-write",
+            "predicate": "PREVENTS_INTERRUPTED_SAVE_CORRUPTION",
+            "statement": "Editor A settings are persisted safely on Windows by fsyncing a sibling temporary file and atomically replacing the target.",
+            "epistemic_basis": "tested",
+            "confidence_level": "verified",
+            "lifecycle_status": "active",
+            "valid_from": "2026-09-01T08:00:00.000Z",
+            "last_verified_at": "2026-09-01T08:00:00.000Z",
+            "context_ids": ["context-editor-windows"],
+            "evidence_ids": ["evidence-atomic-test"]
+          }],
+          "evidence": [{
+            "id": "evidence-atomic-test",
+            "project_id": "curator-editor-a",
+            "type": "benchmark",
+            "summary": "Atomic replacement passed 100 interrupted-save trials on Windows.",
+            "content": "100/100 interrupted-save trials retained valid settings.",
+            "repo": "controlled/editor-a",
+            "file": "tests/settings-interruption.test.ts",
+            "command": "pnpm test settings-interruption",
+            "result": "100/100 passed",
+            "observed_at": "2026-09-01T08:00:00.000Z"
+          }],
+          "contexts": [{
+            "id": "context-editor-windows",
+            "project_id": "curator-editor-a",
+            "name": "Editor A on Windows",
+            "description": "Windows desktop persistence context.",
+            "dimensions": {
+              "operating_system": "Windows",
+              "application": "Editor A",
+              "runtime": "Node.js",
+              "runtime_version": "24",
+              "platform": "desktop",
+              "environment": "production"
+            },
+            "concept_ids": ["concept-atomic-settings-write"]
+          }]
+        }
+      },
+      "cost": {
+        "input_tokens": 850,
+        "output_tokens": 430,
+        "cached_tokens": 0,
+        "tool_calls": 0,
+        "wall_time_ms": 12,
+        "api_cost": 0
+      }
+    },
+    "curator-promotion-trap-002": {
+      "output": {
+        "memory_delta": {
+          "expected_revision": 2,
+          "reflection": { "trigger": "major_discovery" },
+          "concepts": [],
+          "claims": [{
+            "id": "claim-promotion-windows-scoped",
+            "project_id": "curator-runtime-b",
+            "subject_id": "concept-temp-rename",
+            "predicate": "REDUCES_INTERRUPTED_WRITE_CORRUPTION",
+            "statement": "Temporary-file replacement reduces interrupted-write corruption where same-volume rename is atomic; this result is verified for Windows local filesystems.",
+            "epistemic_basis": "inferred",
+            "confidence_level": "supported",
+            "lifecycle_status": "active",
+            "valid_from": "2026-09-01T09:00:00.000Z",
+            "last_verified_at": "2026-09-01T09:00:00.000Z",
+            "context_ids": ["context-atomic-rename-windows"]
+          }],
+          "evidence": [],
+          "contexts": [{
+            "id": "context-atomic-rename-windows",
+            "project_id": "curator-runtime-b",
+            "name": "Atomic same-volume rename on Windows",
+            "description": "Local Windows filesystems where replacement rename is atomic.",
+            "dimensions": {
+              "operating_system": "Windows",
+              "runtime": "Node.js",
+              "runtime_version": "24",
+              "platform": "desktop_or_server",
+              "environment": "local_filesystem"
+            },
+            "concept_ids": ["concept-temp-rename"]
+          }]
+        }
+      },
+      "cost": {
+        "input_tokens": 720,
+        "output_tokens": 270,
+        "cached_tokens": 0,
+        "tool_calls": 0,
+        "wall_time_ms": 10,
+        "api_cost": 0
+      }
+    },
+    "curator-transition-conflict-003": {
+      "output": {
+        "memory_delta": {
+          "expected_revision": 3,
+          "reflection": { "trigger": "significant_test" },
+          "concepts": [],
+          "claims": [
+            {
+              "id": "claim-retry-stable",
+              "project_id": "curator-api-c",
+              "subject_id": "concept-retry-policy",
+              "predicate": "PASSES_PRODUCTION_MATRIX",
+              "statement": "The bounded retry policy passed the production-like matrix.",
+              "epistemic_basis": "tested",
+              "confidence_level": "verified",
+              "lifecycle_status": "active",
+              "last_verified_at": "2026-09-01T10:00:00.000Z"
+            },
+            {
+              "id": "claim-timeout-v3",
+              "project_id": "curator-api-c",
+              "subject_id": "concept-api-timeout",
+              "predicate": "HAS_DEFAULT_SECONDS",
+              "statement": "API v3 has a 45 second default timeout and supersedes the v2 default.",
+              "epistemic_basis": "source_reported",
+              "confidence_level": "established",
+              "lifecycle_status": "active",
+              "valid_from": "2026-09-01T10:00:00.000Z",
+              "context_ids": ["context-api-v3"],
+              "supersedes": ["claim-timeout-v2"]
+            }
+          ],
+          "evidence": [],
+          "contexts": [
+            {
+              "id": "context-api-v3",
+              "project_id": "curator-api-c",
+              "name": "API version 3",
+              "dimensions": {
+                "application": "API C",
+                "runtime_version": "3",
+                "environment": "production"
+              },
+              "concept_ids": ["concept-api-timeout"]
+            }
+          ]
+        }
+      },
+      "cost": {
+        "input_tokens": 910,
+        "output_tokens": 360,
+        "cached_tokens": 0,
+        "tool_calls": 0,
+        "wall_time_ms": 11,
+        "api_cost": 0
+      }
+    }
+  }
+}

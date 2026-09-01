@@ -1,0 +1,52 @@
+name: memoryos
+
+services:
+  memoryos:
+    build:
+      context: .
+      dockerfile: apps/service/Dockerfile
+    environment:
+      MEMORYOS_HOST: 0.0.0.0
+      MEMORYOS_PORT: 7310
+      MEMORYOS_ALLOWED_HOSTS: localhost,127.0.0.1,[::1],memoryos
+      FALKORDB_URL: falkor://falkordb:6379
+      OLLAMA_URL: http://host.docker.internal:11434
+      OLLAMA_EMBEDDING_MODEL: bge-m3
+      MEMORYOS_WEB_ROOT: /app/public
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "127.0.0.1:7310:7310"
+    depends_on:
+      falkordb:
+        condition: service_healthy
+
+  falkordb:
+    image: falkordb/falkordb:v4.20.4-alpine
+    volumes:
+      - memoryos-data:/var/lib/falkordb/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    expose:
+      - "6379"
+
+  backup:
+    image: falkordb/falkordb:v4.20.4-alpine
+    entrypoint: ["sh", "/usr/local/bin/memoryos-backup"]
+    environment:
+      MEMORYOS_BACKUP_INTERVAL_SECONDS: 86400
+      MEMORYOS_BACKUP_RETENTION_DAYS: 14
+    volumes:
+      - memoryos-data:/source:ro
+      - ./backups/automatic:/backups
+      - ./ops/backup-loop.sh:/usr/local/bin/memoryos-backup:ro
+    depends_on:
+      falkordb:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  memoryos-data:

@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "dataset_id": "memoryos-integrated-controlled",
+  "dataset_version": "0.1.0",
+  "prompt_version": "integrated-prompt-v0.1",
+  "toolset_version": "structured-swe-v0.1",
+  "response_contract_version": "integrated-output-v0.1",
+  "agent": {
+    "provider": "benchmark-fixture",
+    "model": "integrated-calibration",
+    "version": "0.1.0",
+    "reasoning_mode": "deterministic-calibration"
+  },
+  "responses": {
+    "integrated-atomic-reuse-001:no_memory": {
+      "output": {
+        "decision": "direct_write_with_retry",
+        "changes": [{"path":"settings-policy.json","content":"{\"save_strategy\":\"direct_write_with_retry\"}"}],
+        "trace": [
+          {"type":"agent_step","name":"inspect"}, {"type":"file_read","name":"settings-policy.json"},
+          {"type":"tool_call","name":"search strategy"}, {"type":"failed_attempt","name":"try direct write","known_failure_id":"direct-write-corruption"},
+          {"type":"test_run","name":"validate"}, {"type":"agent_step","name":"finish"}
+        ],
+        "memory_citations": [],
+        "cost": {"input_tokens":900,"output_tokens":260,"cached_tokens":0,"api_cost":0,"local_compute_time_ms":8}
+      },
+      "wall_time_ms": 120
+    },
+    "integrated-atomic-reuse-001:oracle_memory": {
+      "output": {
+        "decision": "atomic_target_temp_rename",
+        "changes": [{"path":"settings-policy.json","content":"{\"save_strategy\":\"atomic_target_temp_rename\"}"}],
+        "trace": [{"type":"agent_step","name":"reuse memory"},{"type":"file_read","name":"settings-policy.json"},{"type":"test_run","name":"validate"}],
+        "memory_citations": [{"memory_id":"mem-atomic-target-dir","influence":"helpful","stale":false}],
+        "cost": {"input_tokens":620,"output_tokens":150,"cached_tokens":0,"api_cost":0,"local_compute_time_ms":5}
+      },
+      "wall_time_ms": 70
+    },
+    "integrated-atomic-reuse-001:oracle_writes": {
+      "output": {
+        "decision": "atomic_target_temp_rename",
+        "changes": [{"path":"settings-policy.json","content":"{\"save_strategy\":\"atomic_target_temp_rename\"}"}],
+        "trace": [{"type":"agent_step","name":"inspect retrieval"},{"type":"tool_call","name":"memory search"},{"type":"file_read","name":"settings-policy.json"},{"type":"test_run","name":"validate"}],
+        "memory_citations": [{"memory_id":"mem-atomic-target-dir","influence":"helpful","stale":false}],
+        "cost": {"input_tokens":680,"output_tokens":165,"cached_tokens":0,"api_cost":0,"local_compute_time_ms":6}
+      },
+      "wall_time_ms": 82
+    },
+    "integrated-atomic-reuse-001:full_memory_os": {
+      "output": {
+        "decision": "atomic_target_temp_rename",
+        "changes": [{"path":"settings-policy.json","content":"{\"save_strategy\":\"atomic_target_temp_rename\"}"}],
+        "trace": [{"type":"agent_step","name":"use curated memory"},{"type":"tool_call","name":"memory context"},{"type":"file_read","name":"settings-policy.json"},{"type":"test_run","name":"validate"}],
+        "memory_citations": [{"memory_id":"mem-atomic-target-dir","influence":"helpful","stale":false}],
+        "cost": {"input_tokens":700,"output_tokens":170,"cached_tokens":0,"api_cost":0,"local_compute_time_ms":6}
+      },
+      "wall_time_ms": 86
+    },
+    "integrated-atomic-reuse-001:flat_rag": {
+      "output": {
+        "decision": "atomic_target_temp_rename",
+        "changes": [{"path":"settings-policy.json","content":"{\"save_strategy\":\"atomic_target_temp_rename\"}"}],
+        "trace": [{"type":"agent_step","name":"read note"},{"type":"tool_call","name":"rag search"},{"type":"file_read","name":"settings-policy.json"},{"type":"agent_step","name":"interpret chunk"},{"type":"test_run","name":"validate"}],
+        "memory_citations": [{"memory_id":"mem-atomic-target-dir","influence":"helpful","stale":false}],
+        "cost": {"input_tokens":740,"output_tokens":180,"cached_tokens":0,"api_cost":0,"local_compute_time_ms":6}
+      },
+      "wall_time_ms": 92
+    },
+    "integrated-cross-mount-trap-002:no_memory": {
+      "output": {
+        "decision": "target_directory_temp_rename",
+        "changes": [{"path":"deploy-policy.json","content":"{\"temp_location\":\"target_directory\",\"replacement\":\"rename\"}"}],
+        "trace": [
+          {"type":"agent_step","name":"inspect"},{"type":"file_read","name":"deploy-policy.json"},{"type":"shell_call","name":"reason about EXDEV"},
+          {"type":"failed_attempt","name":"consider /tmp rename","known_failure_id":"cross-mount-tmp-rename"},{"type":"agent_step","name":"correct strategy"},{"type":"test_run","name":"validate"}
+        ],
+        "memory_citations": [],
+        "cost": {"input_tokens":980,"output_tokens":280,"cached_tokens":0,"api_cost":0,"local_compute_time_ms":9}
+      },
+      "wall_time_ms": 135
+    },
+    "integrated-cross-mount-trap-002:oracle_memory": {
+      "output": {
+        "decision": "target_directory_temp_rename",
+        "changes": [{"path":"deploy-policy.json","content":"{\"temp_location\":\"target_directory\",\"replacement\":\"rename\"}"}],
+        "trace": [{"type":"agent_step","name":"reuse scoped memory"},{"type":"file_read","name":"deploy-policy.json"},{"type":"test_run","name":"validate"}],
+        "memory_citations": [{"memory_id":"mem-same-dir-cross-mount","influence":"helpful","stale":false}],
+        "cost": {"input_tokens":640,"output_tokens":155,"cached_tokens":0,"api_cost":0,"local_compute_time_ms":5}
+      },
+      "wall_time_ms": 72
+    },
+    "integrated-cross-mount-trap-002:oracle_writes": {
+      "output": {
+        "decision": "target_directory_temp_rename",
+        "changes": [{"path":"deploy-policy.json","content":"{\"temp_location\":\"target_directory\",\"replacement\":\"rename\"}"}],
+        "trace": [{"type":"agent_step","name":"inspect retrieval"},{"type":"tool_call","name":"memory search"},{"type":"file_read","name":"deploy-policy.json"},{"type":"test_run","name":"validate"}],
+        "memory_citations": [{"memory_id":"mem-same-dir-cross-mount","influence":"helpful","stale":false}],
+        "cost": {"input_tokens":690,"output_tokens":170,"cached_tokens":0,"api_cost":0,"local_compute_time_ms":6}
+      },
+      "wall_time_ms": 84
+    },
+    "integrated-cross-mount-trap-002:full_memory_os": {
+      "output": {
+        "decision": "global_tmp_rename",
+        "changes": [{"path":"deploy-policy.json","content":"{\"temp_location\":\"/tmp\",\"replacement\":\"rename\"}"}],
+        "trace": [{"type":"agent_step","name":"trust top memory"},{"type":"tool_call","name":"memory context"},{"type":"file_read","name":"deploy-policy.json"},{"type":"failed_attempt","name":"reuse /tmp rename","known_failure_id":"cross-mount-tmp-rename"}],
+        "memory_citations": [{"memory_id":"mem-global-tmp-rename","influence":"helpful","stale":true}],
+        "cost": {"input_tokens":760,"output_tokens":185,"cached_tokens":0,"api_cost":0,"local_compute_time_ms":6}
+      },
+      "wall_time_ms": 90
+    },
+    "integrated-cross-mount-trap-002:flat_rag": {
+      "output": {
+        "decision": "global_tmp_rename",
+        "changes": [{"path":"deploy-policy.json","content":"{\"temp_location\":\"/tmp\",\"replacement\":\"rename\"}"}],
+        "trace": [{"type":"agent_step","name":"trust retrieved chunk"},{"type":"tool_call","name":"rag search"},{"type":"file_read","name":"deploy-policy.json"},{"type":"failed_attempt","name":"reuse stale note","known_failure_id":"cross-mount-tmp-rename"}],
+        "memory_citations": [{"memory_id":"mem-global-tmp-rename","influence":"helpful","stale":true}],
+        "cost": {"input_tokens":730,"output_tokens":175,"cached_tokens":0,"api_cost":0,"local_compute_time_ms":6}
+      },
+      "wall_time_ms": 88
+    },
+    "integrated-log-checkpoint-003:no_memory": {
+      "output": {
+        "decision": "atomic_checkpoint_replace",
+        "changes": [{"path":"checkpoint-policy.json","content":"{\"save_strategy\":\"atomic_checkpoint_replace\"}"}],
+        "trace": [{"type":"agent_step","name":"inspect"},{"type":"file_read","name":"checkpoint-policy.json"},{"type":"failed_attempt","name":"consider direct write","known_failure_id":"checkpoint-direct-write"},{"type":"tool_call","name":"derive safe policy"},{"type":"agent_step","name":"apply"},{"type":"test_run","name":"validate"}],
+        "memory_citations": [],
+        "cost": {"input_tokens":930,"output_tokens":250,"cached_tokens":0,"api_cost":0,"local_compute_time_ms":8}
+      },
+      "wall_time_ms": 125
+    },
+    "integrated-log-checkpoint-003:oracle_memory": {
+      "output": {
+        "decision": "atomic_checkpoint_replace",
+        "changes": [{"path":"checkpoint-policy.json","content":"{\"save_strategy\":\"atomic_checkpoint_replace\"}"}],
+        "trace": [{"type":"agent_step","name":"reuse memory"},{"type":"file_read","name":"checkpoint-policy.json"},{"type":"test_run","name":"validate"}],
+        "memory_citations": [{"memory_id":"mem-checkpoint-atomic","influence":"helpful","stale":false}],
+        "cost": {"input_tokens":610,"output_tokens":145,"cached_tokens":0,"api_cost":0,"local_compute_time_ms":5}
+      },
+      "wall_time_ms": 68
+    },
+    "integrated-log-checkpoint-003:oracle_writes": {
+      "output": {
+        "decision": "atomic_checkpoint_replace",
+        "changes": [{"path":"checkpoint-policy.json","content":"{\"save_strategy\":\"atomic_checkpoint_replace\"}"}],
+        "trace": [{"type":"agent_step","name":"inspect retrieval"},{"type":"tool_call","name":"memory search"},{"type":"file_read","name":"checkpoint-policy.json"},{"type":"test_run","name":"validate"}],
+        "memory_citations": [{"memory_id":"mem-checkpoint-atomic","influence":"helpful","stale":false}],
+        "cost": {"input_tokens":660,"output_tokens":160,"cached_tokens":0,"api_cost":0,"local_compute_time_ms":6}
+      },
+      "wall_time_ms": 79
+    },
+    "integrated-log-checkpoint-003:full_memory_os": {
+      "output": {
+        "decision": "atomic_checkpoint_replace",
+        "changes": [{"path":"checkpoint-policy.json","content":"{\"save_strategy\":\"atomic_checkpoint_replace\"}"}],
+        "trace": [{"type":"agent_step","name":"apply established policy"},{"type":"file_read","name":"checkpoint-policy.json"},{"type":"test_run","name":"validate"}],
+        "memory_citations": [{"memory_id":"mem-checkpoint-atomic","influence":"helpful","stale":false}],
+        "cost": {"input_tokens":650,"output_tokens":150,"cached_tokens":0,"api_cost":0,"local_compute_time_ms":5}
+      },
+      "wall_time_ms": 74
+    },
+    "integrated-log-checkpoint-003:flat_rag": {
+      "output": {
+        "decision": "atomic_checkpoint_replace",
+        "changes": [{"path":"checkpoint-policy.json","content":"{\"save_strategy\":\"atomic_checkpoint_replace\"}"}],
+        "trace": [{"type":"agent_step","name":"read note"},{"type":"tool_call","name":"rag search"},{"type":"file_read","name":"checkpoint-policy.json"},{"type":"test_run","name":"validate"}],
+        "memory_citations": [{"memory_id":"mem-checkpoint-atomic","influence":"helpful","stale":false}],
+        "cost": {"input_tokens":700,"output_tokens":170,"cached_tokens":0,"api_cost":0,"local_compute_time_ms":6}
+      },
+      "wall_time_ms": 83
+    }
+  }
+}

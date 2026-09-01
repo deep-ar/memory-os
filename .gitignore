@@ -1,0 +1,66 @@
+# Dependencies and package-manager caches
+node_modules/
+.pnpm-store/
+
+# Compiled output and tool caches
+dist/
+coverage/
+.cache/
+.vite/
+*.tsbuildinfo
+
+# Test and browser artifacts
+test-results/
+playwright-report/
+blob-report/
+
+# Runtime logs and temporary files
+*.log
+*.tmp
+*.temp
+*.bak
+tmp/
+temp/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.credentials.json
+*.secrets.json
+.auth/
+secrets/
+
+# Database snapshots, backups, and local runtime data
+backups/*
+!backups/.gitkeep
+*.rdb
+*.rdb.manifest.json
+dump.rdb
+appendonlydir/
+
+# Generated benchmark output
+memoryos-bench/artifacts/*
+!memoryos-bench/artifacts/.gitkeep
+
+# Real-project benchmark inputs are local derived project data
+memoryos-bench/datasets/lucycocos-*.json
+
+# Local agent/index state
+.agents/
+.codex/
+.codegraph/
+
+# Editor and operating-system metadata
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini

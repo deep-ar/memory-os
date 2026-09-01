@@ -1,0 +1,5 @@
+{"timestamp":"2026-08-01T10:00:00.000Z","type":"session_meta","payload":{"id":"session-root-001","timestamp":"2026-08-01T10:00:00.000Z","cwd":"D:\\Projects\\LucyCocos","source":"vscode","git":{"branch":"localization","commit_hash":"abc123"}}}
+{"timestamp":"2026-08-01T10:00:01.000Z","type":"event_msg","payload":{"type":"user_message","message":"Which build policy should be used?"}}
+{"timestamp":"2026-08-01T10:00:02.000Z","type":"event_msg","payload":{"type":"task_complete","last_agent_message":"Use the verified source-build policy because it preserves authored scene behavior."}}
+{"timestamp":"2026-08-01T10:00:03.000Z","type":"event_msg","payload":{"type":"user_message","message":"Start another task"}}
+{"timestamp":"2026-08-01T10:00:04.000Z","type":"event_msg","payload":{"type":"turn_aborted"}}
