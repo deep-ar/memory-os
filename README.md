@@ -110,6 +110,8 @@ Install or link all three MemoryOS skills through the orchestrator's normal skil
 
 The skills are policy, not database migrations. Keep them version-controlled and deploy policy updates through the orchestrator.
 
+Codex users can also install the optional [compaction checkpoint hook](integrations/codex/memoryos-compaction.mjs). It asks the current agent to run a selective `memory-reflection` assessment immediately after context compaction; it does not automatically summarize or persist the session. Each participating repository opts in with an explicit `.memoryos/project.json`. See [agent integration](docs/integrations.md#codex-compaction-checkpoint) for installation and evidence rules.
+
 ## Backup and restore
 
 Prefer an output path outside the repository:

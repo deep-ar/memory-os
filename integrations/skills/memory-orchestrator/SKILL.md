@@ -46,6 +46,8 @@ Do not retrieve merely because MemoryOS is available. If current code answers th
 5. **At a durable checkpoint:** invoke `memory-reflection` only if the work produced reusable knowledge that passes its admission gate.
 6. **Before final handoff:** report material memory assumptions and their verification status. If reflection ran, report what was stored and what remains uncertain or requires lifecycle correction.
 
+Context compaction is a mandatory reflection assessment point, not a mandatory write point. When the runtime exposes a post-compaction continuation hook, use it to invoke `memory-reflection` in the same agent session so semantic judgment remains with the working agent. Do not start a second summarizer agent merely to ingest a transcript.
+
 ## Reflection triggers
 
 Reflect after an architectural or product decision, a non-obvious root cause, a meaningful failed approach, a reusable procedure, a durable user constraint, a significant representative test, a correction to prior knowledge, a handoff, context compaction, or session end with durable learning.

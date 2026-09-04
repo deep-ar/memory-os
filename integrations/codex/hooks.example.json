@@ -1,0 +1,20 @@
+{
+  "description": "Run a selective MemoryOS reflection checkpoint after Codex compacts a mapped project session.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "^compact$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ~/.codex/hooks/memoryos-compaction.mjs",
+            "commandWindows": "node \"C:\\Users\\<USER>\\.codex\\hooks\\memoryos-compaction.mjs\"",
+            "timeout": 10,
+            "statusMessage": "Preparing MemoryOS reflection checkpoint",
+            "additionalContextLimit": 1800
+          }
+        ]
+      }
+    ]
+  }
+}

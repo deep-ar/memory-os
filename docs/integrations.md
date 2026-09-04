@@ -23,3 +23,22 @@ Install or link all three skills using the orchestrator's normal skill mechanism
 - [`memory-reflection`](../integrations/skills/memory-reflection/SKILL.md) curates durable outcomes into one coherent `MemoryDelta`.
 
 The orchestrator and retrieval skills never write memory. Reflection does not decide whether task-time recall is needed. Keep all three files version-controlled so policy improvements do not require a database migration.
+
+## Codex compaction checkpoint
+
+Codex can trigger selective memory reflection immediately after it compacts a session. The integration deliberately uses `SessionStart` with `source=compact`, rather than `PreCompact`: the post-compaction event can add developer context to the immediate continuation, while `PreCompact` cannot ask the current agent to perform semantic work.
+
+1. Copy [`integrations/codex/memoryos-compaction.mjs`](../integrations/codex/memoryos-compaction.mjs) to a stable user-level location such as `~/.codex/hooks/`.
+2. Merge [`integrations/codex/hooks.example.json`](../integrations/codex/hooks.example.json) into `~/.codex/hooks.json` and replace the Windows user placeholder when applicable.
+3. Add `.memoryos/project.json` to each participating project using [`integrations/codex/project.example.json`](../integrations/codex/project.example.json) as the template.
+4. Review and trust the hook through Codex `/hooks`. Codex keys trust to the hook definition, so changing it requires another review.
+
+The project manifest is an explicit mapping, not path-based inference. A session may instead receive `MEMORYOS_PROJECT_ID` from its orchestrator; that explicit environment value takes precedence. If neither exists, the global hook is silent and the project remains opted out.
+
+The hook does not call a model or write MemoryOS itself. It instructs the current agent to invoke `memory-reflection`, whose assessment may intentionally produce no write. Local edits are normally skipped; cross-module behavior and durable decisions are candidates; unfinished research stays tentative; user approval proves a selected direction but not technical correctness; code changes and behavioral validation remain separate Evidence.
+
+Run the deterministic hook tests with:
+
+```powershell
+node --test integrations/codex/memoryos-compaction.test.mjs
+```

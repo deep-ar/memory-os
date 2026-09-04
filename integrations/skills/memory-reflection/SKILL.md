@@ -48,6 +48,20 @@ Store a candidate only when it has likely future reuse value and at least one of
 
 Do not store routine commands, temporary progress, ordinary compiler errors, trivial edits, intermediate reasoning, full transcripts, broad session conclusions, or information useful only for the next step. Do not duplicate facts that are cheap to obtain from the current code graph unless the relationship is a durable anchor for decisions, problems, history, or know-how.
 
+## Compaction checkpoint
+
+At a context-compaction checkpoint, assessment is mandatory but writing is not. Evaluate only durable knowledge added since the latest successful reflection in the session; do not turn the compacted context or transcript into a summary record.
+
+Classify the completed work before applying the admission gate:
+
+- **Isolated local change:** normally write nothing. Admit it only when the work exposed a reusable invariant, non-obvious cause, compatibility boundary, or broadly useful procedure.
+- **Cross-module or system change:** treat decisions, ownership boundaries, invariants, problem-cause-fix links, and changed system behavior as candidates. Scope each Claim to the affected version, branch, build, environment, or runtime where necessary.
+- **Unfinished investigation:** admit only costly-to-reconstruct observations or hypotheses that would materially improve continuation. Use `hypothesis` with `tentative`, preserve an explicitly incomplete Context, and record the next validation needed. Do not store unsupported speculation or routine investigative progress.
+- **Concluded investigation:** explicit user approval or a command to implement establishes the selected direction and is Evidence for intent or decision. It does not prove technical correctness. Preserve the underlying code, test, log, runtime, or document Evidence for each factual conclusion.
+- **Implemented fix or feature:** source or diff Evidence proves what changed. Tests, builds, runtime observations, benchmarks, or device checks separately establish behavior. Never promote a behavioral Claim to `verified` from a patch alone.
+
+Use the current compacted context first. Read the session transcript only when needed to recover an exact user decision, tool observation, or evidence locator. Keep the transcript path and session identity as provenance; never store the transcript itself as semantic memory.
+
 ## Claim construction
 
 Apply all of these rules:
