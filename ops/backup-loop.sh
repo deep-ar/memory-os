@@ -5,11 +5,22 @@ backup_dir=/backups
 source_rdb=/source/dump.rdb
 interval_seconds="${MEMORYOS_BACKUP_INTERVAL_SECONDS:-86400}"
 retention_days="${MEMORYOS_BACKUP_RETENTION_DAYS:-14}"
+retry_seconds="${MEMORYOS_BACKUP_RETRY_SECONDS:-5}"
 
 mkdir -p "$backup_dir"
 
 while true; do
-  redis-cli -h falkordb SAVE >/dev/null
+  if ! redis-cli -h falkordb PING >/dev/null 2>&1; then
+    echo "MemoryOS backup is waiting for FalkorDB at falkordb:6379" >&2
+    sleep "$retry_seconds"
+    continue
+  fi
+
+  if ! redis-cli -h falkordb SAVE >/dev/null; then
+    echo "MemoryOS backup could not create an RDB snapshot; retrying" >&2
+    sleep "$retry_seconds"
+    continue
+  fi
   created_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   stamp="$(date -u +%Y%m%dT%H%M%SZ)"
   snapshot="$backup_dir/memoryos-$stamp.rdb"

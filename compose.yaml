@@ -20,6 +20,7 @@ services:
     depends_on:
       falkordb:
         condition: service_healthy
+    restart: unless-stopped
 
   falkordb:
     image: falkordb/falkordb:v4.20.4-alpine
@@ -32,6 +33,7 @@ services:
       retries: 20
     expose:
       - "6379"
+    restart: unless-stopped
 
   backup:
     image: falkordb/falkordb:v4.20.4-alpine
@@ -39,6 +41,7 @@ services:
     environment:
       MEMORYOS_BACKUP_INTERVAL_SECONDS: 86400
       MEMORYOS_BACKUP_RETENTION_DAYS: 14
+      MEMORYOS_BACKUP_RETRY_SECONDS: 5
     volumes:
       - memoryos-data:/source:ro
       - ./backups/automatic:/backups
