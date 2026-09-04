@@ -34,6 +34,26 @@ function Empty({ title, children }: { title: string; children: React.ReactNode }
   return <div className="empty"><div className="empty__mark">◇</div><h3>{title}</h3><p>{children}</p></div>;
 }
 
+function DetailDisclosure({ marker, kicker, title, count, initiallyOpen = false, children }: {
+  readonly marker: string;
+  readonly kicker: string;
+  readonly title: string;
+  readonly count?: number;
+  readonly initiallyOpen?: boolean;
+  readonly children: React.ReactNode;
+}) {
+  const [expanded, setExpanded] = useState(initiallyOpen);
+  return <details className="detail-section detail-disclosure" open={expanded}
+    onToggle={(event) => setExpanded(event.currentTarget.open)}>
+    <summary>
+      <div className="section-heading"><span>{marker}</span><div><p>{kicker}</p><h2>{title}</h2></div></div>
+      {count !== undefined && <span className="detail-disclosure__count">{count}</span>}
+      <span className="detail-disclosure__chevron" aria-hidden="true">⌄</span>
+    </summary>
+    <div className="detail-disclosure__body">{children}</div>
+  </details>;
+}
+
 function ClaimList({ claims, selected, onSelect }: {
   claims: readonly ClaimSummary[];
   selected: string | null;
@@ -58,8 +78,7 @@ function ClaimList({ claims, selected, onSelect }: {
 
 function EvidencePanel({ explanation }: { explanation: ClaimExplanation }) {
   const evidence = explanation.supportingEvidence;
-  return <section className="detail-section" data-testid="belief-panel">
-    <div className="section-heading"><span>02</span><div><p>Evidence chain</p><h2>WHY DO WE BELIEVE THIS?</h2></div></div>
+  return <div data-testid="belief-panel"><DetailDisclosure marker="02" kicker="Why do we believe this?" title="Evidence" count={evidence.length} initiallyOpen>
     {evidence.length === 0
       ? <Empty title="No supporting Evidence">This Claim currently has no linked Evidence. Treat it according to its epistemic state.</Empty>
       : <div className="evidence-grid">{evidence.map((item) => <article className="evidence-card" key={item.id}>
@@ -77,31 +96,29 @@ function EvidencePanel({ explanation }: { explanation: ClaimExplanation }) {
             {item.contentHash && <><dt>Hash</dt><dd><code>{item.contentHash.slice(0, 16)}…</code></dd></>}
           </dl>
         </article>)}</div>}
-  </section>;
+  </DetailDisclosure></div>;
 }
 
 function ConflictPanel({ conflicts }: { conflicts: readonly PotentialConflict[] }) {
-  return <section className="detail-section">
-    <div className="section-heading"><span>03</span><div><p>Review queue</p><h2>Potential conflicts</h2></div></div>
+  return <DetailDisclosure marker="03" kicker="Review queue" title="Potential conflicts" count={conflicts.length}>
     {conflicts.length === 0 ? <p className="quiet">No structural or semantic conflict candidates were found.</p>
       : <div className="conflict-list">{conflicts.map((conflict) => <article key={conflict.claimId}>
         <div><strong>{conflict.claimId}</strong><p>{conflict.conflictReason.replaceAll("_", " ")}</p></div>
         <span>{Math.round(conflict.similarity * 100)}%</span>
       </article>)}</div>}
     <p className="notice">Candidates are signals for agent or human review. MemoryOS never resolves them automatically.</p>
-  </section>;
+  </DetailDisclosure>;
 }
 
 function HistoryPanel({ events }: { events: readonly HistoryEvent[] }) {
-  return <section className="detail-section">
-    <div className="section-heading"><span>04</span><div><p>Immutable journal</p><h2>Reflection history</h2></div></div>
+  return <DetailDisclosure marker="04" kicker="Immutable journal" title="Reflection history" count={events.length}>
     {events.length === 0 ? <p className="quiet">No Reflection Events are linked to this Claim.</p>
       : <ol className="timeline">{events.map((event) => <li key={event.id}>
         <time>{displayDate(event.createdAt)}</time><strong>{event.trigger.replaceAll("_", " ")}</strong>
         <p>{event.operations.map((operation) => `${operation.type} ${operation.entityId}`).join(" · ")}</p>
         <code>{event.id}</code>
       </li>)}</ol>}
-  </section>;
+  </DetailDisclosure>;
 }
 
 function ClaimDetail({ explanation, conflicts, history }: {
@@ -121,10 +138,9 @@ function ClaimDetail({ explanation, conflicts, history }: {
       <div className="validity"><span>Valid from {displayDate(claim.validFrom)}</span><span>Valid to {displayDate(claim.validTo)}</span><span>Revision {claim.revision}</span></div>
     </section>
     <EvidencePanel explanation={explanation} />
-    <section className="detail-section provenance">
-      <div className="section-heading"><span>↳</span><div><p>Origin</p><h2>Provenance</h2></div></div>
+    <DetailDisclosure marker="↳" kicker="Origin" title="Provenance">
       <dl className="facts facts--wide">{Object.entries(explanation.provenance).filter(([, value]) => value).map(([key, value]) => <div key={key}><dt>{key}</dt><dd><code>{value}</code></dd></div>)}</dl>
-    </section>
+    </DetailDisclosure>
     <ConflictPanel conflicts={conflicts} />
     <HistoryPanel events={history.length > 0 ? history : explanation.reflectionHistory} />
   </div>;
@@ -174,7 +190,7 @@ function ContextPicker({ catalog, selected, onSelect }: {
   readonly onSelect: (id: string) => void;
 }) {
   return <section className="context-section">
-    <div className="context-section__head"><div><p>Context lens</p><h2>Browse memory without Search</h2></div><span>{catalog.contexts.length} contexts · {catalog.unscopedClaims} unscoped</span></div>
+    <div className="context-section__label"><strong>Context</strong><span>{catalog.contexts.length} available · {catalog.unscopedClaims} unscoped Claims</span></div>
     {catalog.contexts.length === 0 ? <Empty title="No Contexts recorded">Claims can still be found through Search. Add explicit Contexts during reflection to make the map browsable.</Empty>
       : <div className="context-strip">{catalog.contexts.map((context) => <button
         type="button" key={context.id} onClick={() => onSelect(context.id)}
@@ -188,10 +204,17 @@ function ContextPicker({ catalog, selected, onSelect }: {
 
 function HealthStrip({ graph }: { readonly graph: ContextGraph }) {
   const health = graph.health;
-  return <div className="health-strip">
-    <Stat label="Claims" value={health.claims}/><Stat label="Concepts" value={health.concepts}/><Stat label="Relations" value={health.relations}/><Stat label="Recent" value={health.recent}/>
-    <Stat label="No Evidence" value={health.withoutEvidence} attention/><Stat label="Disputed" value={health.disputed} attention/><Stat label="Components" value={health.components} attention={health.components > 1}/><Stat label="Isolated" value={health.isolatedConcepts} attention/>
-  </div>;
+  const reviewSignals = health.withoutEvidence + health.disputed + health.tentative + health.isolatedConcepts;
+  return <details className="health-panel">
+    <summary><strong>Health</strong><span>{health.claims} Claims · {health.concepts} Concepts · {health.relations} Relations</span>
+      <span className={reviewSignals > 0 || health.components > 1 ? "health-panel__attention" : ""}>
+        {reviewSignals} review signals · {health.components} components
+      </span><span className="health-panel__chevron" aria-hidden="true">⌄</span></summary>
+    <div className="health-strip">
+      <Stat label="Claims" value={health.claims}/><Stat label="Concepts" value={health.concepts}/><Stat label="Relations" value={health.relations}/><Stat label="Recent" value={health.recent}/>
+      <Stat label="No Evidence" value={health.withoutEvidence} attention/><Stat label="Disputed" value={health.disputed} attention/><Stat label="Components" value={health.components} attention={health.components > 1}/><Stat label="Isolated" value={health.isolatedConcepts} attention/>
+    </div>
+  </details>;
 }
 
 export function App() {
@@ -207,6 +230,7 @@ export function App() {
   const [includeHistory, setIncludeHistory] = useState(false);
   const [graphLimit, setGraphLimit] = useState(100);
   const [graphSelection, setGraphSelection] = useState<GraphSelection | null>(null);
+  const [inspectorCollapsed, setInspectorCollapsed] = useState(false);
   const [query, setQuery] = useState("MemoryOS agent tools");
   const [search, setSearch] = useState<SearchResult | null>(null);
   const [selectedClaimId, setSelectedClaimId] = useState<string | null>(initial.get("claim"));
@@ -301,7 +325,7 @@ export function App() {
 
   function chooseProject(next: string) {
     setProjectId(next); setCatalog(null); setContextId(null); setGraph(null); setSearch(null);
-    setSelectedClaimId(null); setExplanation(null); setGraphSelection(null); setError(null); setGraphLimit(100);
+    setSelectedClaimId(null); setExplanation(null); setGraphSelection(null); setError(null); setGraphLimit(100); setInspectorCollapsed(false);
   }
 
   function chooseContext(next: string) {
@@ -316,6 +340,7 @@ export function App() {
   const handleGraphSelection = useCallback((selection: GraphSelection) => {
     setGraphSelection(selection);
     setSelectedClaimId(selection.kind === "node" && selection.node.kind === "claim" ? selection.node.id : null);
+    setInspectorCollapsed(false);
   }, []);
 
   const mapInspector = (() => {
@@ -338,17 +363,20 @@ export function App() {
       <div className="sidebar-footer"><span className="live-dot" /> local service ready</div>
     </aside>
     <main>
-      <header className="topbar"><div><p>INSPECTION WORKSPACE</p><h1>{selectedProject?.project.name ?? "MemoryOS"}</h1></div><div className="revision">Project revision <strong>{selectedProject?.project.revision ?? "—"}</strong></div></header>
       {error && <div className="error-banner"><strong>Request failed</strong><span>{error}</span><button onClick={() => setError(null)}>Dismiss</button></div>}
       {selectedProject ? <>
-        <section className="overview">
-          <div className="overview__copy"><p>{selectedProject.project.description ?? "Structured, evidence-backed project memory."}</p><code>{selectedProject.project.id}</code></div>
-          <div className="stats"><Stat label="Concepts" value={selectedProject.counts.concepts}/><Stat label="Claims" value={selectedProject.counts.claims}/><Stat label="Evidence" value={selectedProject.counts.evidence}/><Stat label="Contexts" value={selectedProject.counts.contexts}/></div>
-        </section>
-        <div className="mode-tabs" role="tablist" aria-label="Explorer mode">
-          <button type="button" role="tab" aria-selected={mode === "map"} className={mode === "map" ? "active" : ""} onClick={() => setMode("map")}>Context map</button>
-          <button type="button" role="tab" aria-selected={mode === "search"} className={mode === "search" ? "active" : ""} onClick={() => setMode("search")}>Search</button>
-        </div>
+        <header className="topbar">
+          <div className="topbar__identity"><p>INSPECTION WORKSPACE</p><div className="topbar__title"><h1>{selectedProject.project.name}</h1><span className="revision">r<strong>{selectedProject.project.revision}</strong></span></div>
+            <div className="topbar__meta"><span>{selectedProject.project.description ?? "Structured, evidence-backed project memory."}</span><code>{selectedProject.project.id}</code></div>
+          </div>
+          <div className="topbar__tools">
+            <div className="stats"><Stat label="Concepts" value={selectedProject.counts.concepts}/><Stat label="Claims" value={selectedProject.counts.claims}/><Stat label="Evidence" value={selectedProject.counts.evidence}/><Stat label="Contexts" value={selectedProject.counts.contexts}/></div>
+            <div className="mode-tabs" role="tablist" aria-label="Explorer mode">
+              <button type="button" role="tab" aria-selected={mode === "map"} className={mode === "map" ? "active" : ""} onClick={() => setMode("map")}>Context map</button>
+              <button type="button" role="tab" aria-selected={mode === "search"} className={mode === "search" ? "active" : ""} onClick={() => setMode("search")}>Search</button>
+            </div>
+          </div>
+        </header>
         {mode === "map" ? <>
           {catalog ? <ContextPicker catalog={catalog} selected={contextId} onSelect={chooseContext}/>
             : <div className="loading-panel">Loading Contexts…</div>}
@@ -357,18 +385,21 @@ export function App() {
             <label><input type="checkbox" checked={includeUnscoped} onChange={(event) => setIncludeUnscoped(event.target.checked)}/> Unscoped</label>
             <label><input type="checkbox" checked={includeHistory} onChange={(event) => setIncludeHistory(event.target.checked)}/> History</label>
             <span className="map-toolbar__legend"><i className="legend-dot legend-dot--review"/> review <i className="legend-dot legend-dot--backbone"/> backbone <i className="legend-dot legend-dot--boundary"/> boundary</span>
-            {graph?.truncated && <button type="button" onClick={() => setGraphLimit(Math.min(graph.totalPrimaryClaims, 1_000))}>Show all {Math.min(graph.totalPrimaryClaims, 1_000)}</button>}
+            <div className="map-toolbar__actions">
+              {graph?.truncated && <button type="button" onClick={() => setGraphLimit(Math.min(graph.totalPrimaryClaims, 1_000))}>Show all {Math.min(graph.totalPrimaryClaims, 1_000)}</button>}
+              <button type="button" onClick={() => setInspectorCollapsed((value) => !value)}>{inspectorCollapsed ? "Show details" : "Hide details"}</button>
+            </div>
           </div>}
           {graph && <HealthStrip graph={graph}/>}
-          <div className="map-workspace">
+          <div className={`map-workspace${inspectorCollapsed ? " map-workspace--inspector-collapsed" : ""}`}>
             <section className="map-panel">
               {mapLoading ? <div className="loading-panel">Building semantic map…</div>
                 : graph && graph.nodes.length > 0 ? <>
-                  <div className="map-panel__head"><div><p>{graph.context.name}</p><strong>{graph.includedPrimaryClaims} of {graph.totalPrimaryClaims} primary Claims</strong></div><small>{graph.nodes.length} nodes · {graph.edges.length} links</small></div>
-                  <KnowledgeGraphCanvas graph={graph} onSelect={handleGraphSelection}/>
+                  <div className="map-panel__head"><div><p>{graph.context.name}</p><strong>{graph.includedPrimaryClaims} of {graph.totalPrimaryClaims} primary Claims</strong></div><small>{graph.nodes.length} nodes · {graph.edges.length} links · double-click to focus</small></div>
+                  <KnowledgeGraphCanvas graph={graph} selectedNodeId={graphSelection?.kind === "node" ? graphSelection.node.id : null} onSelect={handleGraphSelection}/>
                 </> : <Empty title="No visible knowledge">This Context has no Claims for the selected layers.</Empty>}
             </section>
-            <section className="inspector map-inspector">{mapInspector}</section>
+            <section className="inspector map-inspector" aria-hidden={inspectorCollapsed}>{mapInspector}</section>
           </div>
         </> : <>
           <form className="search" onSubmit={submitSearch}><span>⌕</span><input aria-label="Search project memory" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search claims, evidence, concepts…"/><button disabled={loading}>{loading ? "Searching…" : "Search memory"}</button></form>

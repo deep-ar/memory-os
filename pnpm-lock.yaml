@@ -62,6 +62,9 @@ importers:
       cytoscape:
         specifier: ^3.34.2
         version: 3.34.2
+      cytoscape-navigator:
+        specifier: ^2.0.2
+        version: 2.0.2(cytoscape@3.34.2)
       react:
         specifier: 19.2.8
         version: 19.2.8
@@ -723,6 +726,11 @@ packages:
 
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
+
+  cytoscape-navigator@2.0.2:
+    resolution: {integrity: sha512-TZFBLFWEMW858UOt4rzusOjtDj7YT5vNx2uCwpUuicUYbaWCHHcUROBZWO+hiuSPWpVhvGLFlOq3NBcAVYOAgw==}
+    peerDependencies:
+      cytoscape: ^2.6.0 || ^3.0.0
 
   cytoscape@3.34.2:
     resolution: {integrity: sha512-Cm2jaj1X/PBNlzV9yH8zcfGOxO7U+CJ/+mxSBVPSchLaugdp4jtlGx5qaHtPRZ6tgiZ5P+o1XoRfJA+ba6KM3g==}
@@ -1670,6 +1678,10 @@ snapshots:
       which: 2.0.2
 
   csstype@3.2.3: {}
+
+  cytoscape-navigator@2.0.2(cytoscape@3.34.2):
+    dependencies:
+      cytoscape: 3.34.2
 
   cytoscape@3.34.2: {}
 
