@@ -8,6 +8,7 @@ import {
 import { hostHeaderValidation, originValidation, toNodeHandler } from "@modelcontextprotocol/node";
 import type { EmbeddingModelIdentity } from "./modules/retrieval/index.js";
 import type { MemoryToolService } from "./modules/memory-tools/index.js";
+import type { KnowledgeMapService } from "./modules/knowledge-map/index.js";
 import type { ProjectOverview } from "./modules/projects/index.js";
 import type { IntegrityReport } from "./modules/integrity/index.js";
 import type { HardDeleteEvidenceCommand, HardDeleteEvidenceResult } from "./modules/sensitive-data/index.js";
@@ -32,6 +33,7 @@ export function createApp(options: {
   readonly allowedHostnames?: readonly string[];
   readonly registerProject?: (command: RegisterProjectCommand) => Promise<ProjectRegistrationResult>;
   readonly tools?: MemoryToolService;
+  readonly knowledgeMap?: KnowledgeMapService;
   readonly listProjects?: () => Promise<readonly ProjectOverview[]>;
   readonly staticRoot?: string;
   readonly checkIntegrity?: () => Promise<IntegrityReport>;
@@ -90,6 +92,7 @@ export function createApp(options: {
   if (options.tools !== undefined && options.listProjects !== undefined) {
     registerMemoryReadRoutes(app, {
       tools: options.tools,
+      ...(options.knowledgeMap === undefined ? {} : { knowledgeMap: options.knowledgeMap }),
       listProjects: options.listProjects,
       validateRequest: (host, origin) => {
         const hostResult = validateHostHeader(host, allowedHostnames);

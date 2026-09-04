@@ -70,3 +70,16 @@ Completed evidence: production Compose serves the React SPA from the Node servic
 Exit criteria: all architectural invariants have an automated or documented acceptance proof.
 
 Completed evidence: the pinned real FalkorDB plus native Ollama/BGE-M3 suite passes serially; schema 0-to-1 migration and deliberately corrupted integrity fixtures are covered. Compose creates daily checksummed RDB snapshots with retention, and the produced artifact passed both SHA-256 and `redis-check-rdb`. Local-only defaults, optional mandatory Bearer authentication for external access, Host/Origin guards, domain-level secret rejection, audited Evidence hard-delete, lifecycle metrics, operation outcomes/latencies, and content-free `apply_delta` traces have automated coverage. Production `doctor`, `/api/v1/integrity`, `/metrics`, and Chrome E2E passed.
+
+## Stage 8 — context-first knowledge map
+
+- add a read-only Knowledge Map module and FalkorDB adapter without changing the primary schema;
+- list explicit Contexts and report unscoped knowledge separately;
+- render Concept and first-class Claim nodes with directed structural and Claim relationships;
+- keep Evidence, provenance, conflicts, and ReflectionEvent history in the inspector;
+- prioritize review signals, semantic backbone, recent knowledge, descriptive knowledge, and history deterministically;
+- expose boundary, unscoped, history, truncation, and health controls without requiring Search.
+
+Exit criteria: the Context map opens without a search query; unit and real FalkorDB adapter tests cover scope, graph semantics, priorities, and limits; Playwright covers Context selection and Claim Evidence; production Compose serves the split React/Cytoscape build without changing stored memory.
+
+Completed evidence: the read-only Context catalog and knowledge-map endpoints are covered by policy, HTTP, and real FalkorDB tests; the Chrome suite opens a Context graph without Search, selects a Claim, inspects its Evidence, and exercises the unscoped layer. The production Compose service returns the selected `agent-memory` Context graph in 11 ms on the current local dataset, serves Cytoscape as a separate lazy-loaded bundle, and retains the existing FalkorDB volume and schema.

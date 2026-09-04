@@ -12,7 +12,7 @@ The system stores semantic knowledge rather than transcripts or session summarie
 - semantic, full-text, graph, temporal, contextual, and epistemic retrieval with deterministic RRF fusion;
 - eight canonical MCP tools over Streamable HTTP and a thin stdio proxy;
 - an operational CLI for lifecycle, project registration, diagnostics, backup, and restore;
-- a React SPA for human inspection of projects, Claims, Evidence, conflicts, provenance, and history;
+- a React SPA for context-first graph browsing plus inspection of Claims, Evidence, conflicts, provenance, and history;
 - project-invariant skills for memory orchestration, retrieval, verification, and reflection;
 - a detachable benchmark with controlled, Curator, Integrated, and real-session evaluation tracks.
 
@@ -68,6 +68,8 @@ After startup:
 - metrics: `http://127.0.0.1:7310/metrics`.
 
 The normal topology binds MemoryOS only to `127.0.0.1`. FalkorDB is not published to the host, and the `memoryos-data` volume survives ordinary container stop and recreation.
+
+The Explorer opens in **Context map** mode. Select a logical project and a Context to inspect its connected Concepts and first-class Claims without entering a search query. `SUBJECT`, `OBJECT`, `SUPPORTS`, `CONTRADICTS`, `SUPERSEDES`, `REFINES`, and `DERIVED_FROM` retain their direction on the canvas. Evidence and ReflectionEvent provenance remain in the details panel. Optional toggles expose one-hop boundary Claims, unscoped Claims, and historical knowledge; **Search** remains available as a separate retrieval workflow.
 
 Stop the services without deleting persistent memory:
 

@@ -49,6 +49,7 @@ The deployable application is a modular Node.js service. Memory OS and FalkorDB 
 | Knowledge | Knowledge entities and epistemic/temporal invariants | Concepts, Claims, Evidence, Contexts | Persistence or transport | validated domain operations |
 | Reflection | Atomic reconciliation of new knowledge | MemoryDelta policy and ReflectionEvent creation | Graph queries or MCP formatting | apply delta use case |
 | Retrieval | Connected, explainable knowledge retrieval | Ranking and subgraph assembly policy | Embedding inference or FalkorDB syntax | search/context/explain queries |
+| Knowledge map | Context-first human inspection projection | Canvas node selection, audit flags, deterministic priority and response limits | Cypher, React layout, or memory mutation | context catalog and context graph queries |
 | History | Immutable audit and temporal views | Event interpretation and replay rules | Storage-specific journaling | history queries |
 | MCP transport | Agent-facing protocol adapter | MCP schemas and result mapping | Epistemic decisions | canonical memory tools |
 | Admin HTTP | Human-facing administration adapter | HTTP mapping and authorization | Domain policy | versioned REST API |
@@ -79,6 +80,7 @@ Domain code must not import Fastify, MCP SDK, FalkorDB, Ollama, React, environme
 | --- | --- | --- | --- |
 | MemoryWriteStore | Atomic delta commit and revision control | FalkorDB | Storage adapter and its tests |
 | MemoryReadStore | Claim, history, and graph reads | FalkorDB | Storage adapter and query tests |
+| KnowledgeMapReadStore | Context catalog and semantic graph source reads | FalkorDB | Knowledge-map adapter, wiring, and integration tests |
 | EmbeddingProvider | Dense document/query embeddings | Ollama BGE-M3 | Embedding adapter, config, reindex |
 | Clock | Transaction timestamps | System clock | Composition root/test fake |
 | IdGenerator | Stable primary IDs | UUID | Composition root/test fake |
@@ -92,6 +94,9 @@ Domain code must not import Fastify, MCP SDK, FalkorDB, Ollama, React, environme
 - Event journal and current graph use one primary store unless the FalkorDB atomicity spike disproves that design.
 - Ollama is a replaceable embedding runtime only. It performs no generative or epistemic work.
 - The SPA uses Admin HTTP, not MCP.
+- Context is a browsing scope rather than a canvas node. The visual graph contains only Concept and first-class Claim nodes; Evidence and ReflectionEvents remain inspectable metadata.
+- Knowledge-map priorities are deterministic audit policy. Confidence and lifecycle affect badges/borders, never semantic node size.
+- Context-map reads do not mutate the primary graph, add derived storage, or couple benchmark artifacts into production memory.
 - No ORM, GraphQL, external message queue, Redux, or reranker in the first release.
 
 ## Failure rules
@@ -111,7 +116,7 @@ Domain code must not import Fastify, MCP SDK, FalkorDB, Ollama, React, environme
 - FalkorDB integration tests against the pinned container;
 - MCP conformance tests over Streamable HTTP and stdio;
 - retrieval fixtures covering Russian, English, code symbols, context, and time;
-- Playwright tests for search, explanation, history, and conflicts;
+- Playwright tests for context browsing without Search, graph selection, search, explanation, history, and conflicts;
 - backup/restore and event replay tests;
 - import-boundary checks preventing infrastructure leakage.
 

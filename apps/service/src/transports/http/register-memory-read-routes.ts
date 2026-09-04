@@ -1,11 +1,20 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import type { MemoryToolService } from "../../modules/memory-tools/index.js";
+import { knowledgeMapLimits, type KnowledgeMapService } from "../../modules/knowledge-map/index.js";
 import type { ProjectOverview } from "../../modules/projects/index.js";
 import type { AdminRequestValidator } from "./types.js";
 
 const ProjectParams = z.object({ projectId: z.string().min(1).max(128) }).strict();
 const ClaimParams = ProjectParams.extend({ claimId: z.string().min(1).max(200) }).strict();
+const ContextParams = ProjectParams.extend({ contextId: z.string().min(1).max(200) }).strict();
+const BooleanQuery = z.enum(["true", "false"]).transform((value) => value === "true");
+const ContextGraphQuery = z.object({
+  include_boundary: BooleanQuery.optional(),
+  include_unscoped: BooleanQuery.optional(),
+  include_history: BooleanQuery.optional(),
+  limit: z.coerce.number().int().min(1).max(knowledgeMapLimits.maximum).optional(),
+}).strict();
 const SearchQuery = z.object({
   q: z.string().trim().min(1).max(2_000),
   limit: z.coerce.number().int().min(1).max(100).optional(),
@@ -44,6 +53,7 @@ export function registerMemoryReadRoutes(
   app: FastifyInstance,
   options: {
     readonly tools: MemoryToolService;
+    readonly knowledgeMap?: KnowledgeMapService;
     readonly listProjects: () => Promise<readonly ProjectOverview[]>;
     readonly validateRequest: AdminRequestValidator;
   },
@@ -53,6 +63,49 @@ export function registerMemoryReadRoutes(
     if (rejected !== null) return rejected;
     return { projects: await options.listProjects() };
   });
+
+  if (options.knowledgeMap !== undefined) {
+    app.get("/api/v1/projects/:projectId/contexts", async (request, reply) => {
+      const rejected = guard(request, reply, options.validateRequest);
+      if (rejected !== null) return rejected;
+      const params = ProjectParams.safeParse(request.params);
+      if (!params.success) return rejectInvalid(reply, params.error.issues);
+      const result = await options.knowledgeMap!.listContexts(params.data.projectId);
+      if (result === null) {
+        reply.code(404);
+        return { status: "failed", error: { code: "PROJECT_NOT_FOUND" } };
+      }
+      return result;
+    });
+
+    app.get("/api/v1/projects/:projectId/contexts/:contextId/graph", async (request, reply) => {
+      const rejected = guard(request, reply, options.validateRequest);
+      if (rejected !== null) return rejected;
+      const params = ContextParams.safeParse(request.params);
+      const query = ContextGraphQuery.safeParse(request.query);
+      if (!params.success || !query.success) {
+        return rejectInvalid(reply, [...(params.success ? [] : params.error.issues), ...(query.success ? [] : query.error.issues)]);
+      }
+      try {
+        const result = await options.knowledgeMap!.getContextGraph({
+          projectId: params.data.projectId,
+          contextId: params.data.contextId,
+          ...(query.data.include_boundary === undefined ? {} : { includeBoundary: query.data.include_boundary }),
+          ...(query.data.include_unscoped === undefined ? {} : { includeUnscoped: query.data.include_unscoped }),
+          ...(query.data.include_history === undefined ? {} : { includeHistory: query.data.include_history }),
+          ...(query.data.limit === undefined ? {} : { limit: query.data.limit }),
+        });
+        if (result === null) {
+          reply.code(404);
+          return { status: "failed", error: { code: "CONTEXT_NOT_FOUND" } };
+        }
+        return result;
+      } catch (error) {
+        if (error instanceof RangeError) return rejectInvalid(reply, [{ message: error.message }]);
+        throw error;
+      }
+    });
+  }
 
   app.get("/api/v1/projects/:projectId/search", async (request, reply) => {
     const rejected = guard(request, reply, options.validateRequest);

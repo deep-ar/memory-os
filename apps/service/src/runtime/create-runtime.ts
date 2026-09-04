@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import { OllamaEmbeddingProvider } from "../adapters/embeddings/ollama-embedding-provider.js";
 import { FalkorDbMemoryReadStore } from "../adapters/memory/falkordb-memory-read-store.js";
+import { FalkorDbKnowledgeMapReadStore } from "../adapters/memory/falkordb-knowledge-map-read-store.js";
 import { FalkorDbMemoryStore } from "../adapters/memory/falkordb-memory-store.js";
 import { FalkorDbRetrievalStore } from "../adapters/memory/falkordb-retrieval-store.js";
 import { FalkorDbSearchIndexStore } from "../adapters/memory/falkordb-search-index-store.js";
@@ -10,6 +11,7 @@ import { LocalMetricsRegistry } from "../adapters/metrics/local-metrics-registry
 import type { AppReadiness } from "../app.js";
 import type { ServiceConfig } from "../config.js";
 import { createMemoryToolService, type MemoryToolService } from "../modules/memory-tools/index.js";
+import { createKnowledgeMapService, type KnowledgeMapService } from "../modules/knowledge-map/index.js";
 import { createCheckIntegrity, type IntegrityReport } from "../modules/integrity/index.js";
 import { instrumentMemoryTools } from "../modules/observability/index.js";
 import {
@@ -25,6 +27,7 @@ import { createHardDeleteEvidence, type HardDeleteEvidenceCommand, type HardDele
 
 export interface MemoryOsRuntime {
   readonly tools: MemoryToolService;
+  readonly knowledgeMap: KnowledgeMapService;
   readonly readiness: AppReadiness;
   readonly registerProject: (command: RegisterProjectCommand) => Promise<ProjectRegistrationResult>;
   readonly listProjects: () => Promise<readonly ProjectOverview[]>;
@@ -57,6 +60,11 @@ export async function createRuntime(config: ServiceConfig): Promise<MemoryOsRunt
       graphName: config.MEMORYOS_GRAPH_NAME,
     });
     resources.push(reads);
+    const knowledgeMapReads = await FalkorDbKnowledgeMapReadStore.connect({
+      url: config.FALKORDB_URL,
+      graphName: config.MEMORYOS_GRAPH_NAME,
+    });
+    resources.push(knowledgeMapReads);
     const integrity = await FalkorDbIntegrityStore.connect({
       url: config.FALKORDB_URL,
       graphName: config.MEMORYOS_GRAPH_NAME,
@@ -103,6 +111,7 @@ export async function createRuntime(config: ServiceConfig): Promise<MemoryOsRunt
 
     return {
       tools,
+      knowledgeMap: createKnowledgeMapService(knowledgeMapReads),
       readiness: { storage: "ready", embedding: embeddingIdentity, embeddingIndex },
       registerProject: createRegisterProject(memory),
       listProjects: createListProjects(memory),

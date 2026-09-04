@@ -14,6 +14,7 @@ try {
     allowedHostnames: config.MEMORYOS_ALLOWED_HOSTS,
     registerProject: runtime.registerProject,
     tools: runtime.tools,
+    knowledgeMap: runtime.knowledgeMap,
     listProjects: runtime.listProjects,
     checkIntegrity: runtime.checkIntegrity,
     metrics: runtime.metrics,

@@ -33,6 +33,111 @@ export interface ClaimSummary {
   readonly score?: number;
 }
 
+export interface ContextDimensions {
+  readonly operatingSystem: string | null;
+  readonly application: string | null;
+  readonly runtime: string | null;
+  readonly runtimeVersion: string | null;
+  readonly framework: string | null;
+  readonly frameworkVersion: string | null;
+  readonly platform: string | null;
+  readonly environment: string | null;
+}
+
+export interface ContextHealth {
+  readonly claims: number;
+  readonly concepts: number;
+  readonly relations: number;
+  readonly active: number;
+  readonly disputed: number;
+  readonly tentative: number;
+  readonly withoutEvidence: number;
+  readonly historical: number;
+  readonly recent: number;
+  readonly components: number;
+  readonly isolatedConcepts: number;
+  readonly probableDuplicateConcepts: number;
+}
+
+export interface ContextSummary {
+  readonly id: string;
+  readonly name: string;
+  readonly description: string | null;
+  readonly dimensions: ContextDimensions;
+  readonly health: Omit<ContextHealth, "relations" | "recent" | "components" | "isolatedConcepts" | "probableDuplicateConcepts">;
+}
+
+export interface ContextRecord {
+  readonly id: string;
+  readonly name: string;
+  readonly description: string | null;
+  readonly dimensions: ContextDimensions;
+  readonly conceptIds: readonly string[];
+}
+
+export interface ContextCatalog {
+  readonly projectId: string;
+  readonly projectRevision: number;
+  readonly contexts: readonly ContextSummary[];
+  readonly unscopedClaims: number;
+}
+
+interface MapNodeBase {
+  readonly id: string;
+  readonly priority: "P0" | "P1" | "P2" | "P3" | "P4";
+  readonly flags: readonly string[];
+  readonly localDegree: number;
+  readonly boundary: boolean;
+}
+
+export interface ConceptMapNode extends MapNodeBase {
+  readonly kind: "concept";
+  readonly canonicalName: string;
+  readonly description: string | null;
+  readonly conceptType: string;
+  readonly aliases: readonly string[];
+}
+
+export interface ClaimMapNode extends MapNodeBase, ClaimSummary {
+  readonly kind: "claim";
+}
+
+export type KnowledgeMapNode = ConceptMapNode | ClaimMapNode;
+
+export interface KnowledgeMapEdge {
+  readonly id: string;
+  readonly source: string;
+  readonly target: string;
+  readonly relation: "SUBJECT" | "OBJECT" | "SUPPORTS" | "CONTRADICTS" | "SUPERSEDES" | "REFINES" | "DERIVED_FROM";
+  readonly kind: "structural" | "claim_relation";
+  readonly boundary: boolean;
+}
+
+export interface ContextGraph {
+  readonly projectId: string;
+  readonly projectRevision: number;
+  readonly context: ContextRecord;
+  readonly options: {
+    readonly includeBoundary: boolean;
+    readonly includeUnscoped: boolean;
+    readonly includeHistory: boolean;
+    readonly limit: number;
+  };
+  readonly nodes: readonly KnowledgeMapNode[];
+  readonly edges: readonly KnowledgeMapEdge[];
+  readonly health: ContextHealth;
+  readonly totalPrimaryClaims: number;
+  readonly includedPrimaryClaims: number;
+  readonly truncated: boolean;
+}
+
+export interface ContextGraphOptions {
+  readonly includeBoundary?: boolean;
+  readonly includeUnscoped?: boolean;
+  readonly includeHistory?: boolean;
+  readonly limit?: number;
+}
+
 export interface Evidence {
   readonly id: string;
   readonly type: string;
@@ -127,6 +232,18 @@ export const memoryApi = {
   },
   search(projectId: string, query: string): Promise<SearchResult> {
     return request(`${projectPath(projectId)}/search?q=${encodeURIComponent(query)}&limit=30`);
+  },
+  contexts(projectId: string): Promise<ContextCatalog> {
+    return request(`${projectPath(projectId)}/contexts`);
+  },
+  contextGraph(projectId: string, contextId: string, options: ContextGraphOptions = {}): Promise<ContextGraph> {
+    const query = new URLSearchParams();
+    if (options.includeBoundary !== undefined) query.set("include_boundary", String(options.includeBoundary));
+    if (options.includeUnscoped !== undefined) query.set("include_unscoped", String(options.includeUnscoped));
+    if (options.includeHistory !== undefined) query.set("include_history", String(options.includeHistory));
+    if (options.limit !== undefined) query.set("limit", String(options.limit));
+    const suffix = query.size === 0 ? "" : `?${query.toString()}`;
+    return request(`${projectPath(projectId)}/contexts/${encodeURIComponent(contextId)}/graph${suffix}`);
   },
   explanation(projectId: string, claimId: string): Promise<ClaimExplanation> {
     return request(`${projectPath(projectId)}/claims/${encodeURIComponent(claimId)}/explanation`);
